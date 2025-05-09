@@ -6,7 +6,7 @@ pub trait Update {
     fn update(
         &mut self,
         _action: &InputAction,
-        entities: Vec<Box<dyn Entity>>,
+        _entities: Vec<Box<dyn Entity>>,
     ) -> Result<(), String> {
         Err(String::from("Update function was not implemented!"))
     }
