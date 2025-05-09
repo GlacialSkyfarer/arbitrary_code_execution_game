@@ -1,9 +1,7 @@
 use std::collections::HashSet;
 
-use macroquad::input;
 use macroquad::input::KeyCode;
 use macroquad::input::is_key_down;
-use macroquad::input::is_key_pressed;
 use macroquad::math::Vec2;
 
 pub struct InputMap {
