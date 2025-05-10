@@ -1,7 +1,8 @@
+use std::cell::RefCell;
+
 use arbitrary_code_execution_game::{
-    entities::{Entity, Player},
+    entities::{Entity, Mover, Player},
     input::{InputAction, InputMap, get_turn_input},
-    *,
 };
 use macroquad::prelude::*;
 
@@ -16,10 +17,14 @@ async fn main() {
         undo: KeyCode::Z,
         pause: KeyCode::Escape,
     };
-    let mut entities: Vec<Box<dyn Entity>> = Vec::new();
+    let mut entities: Vec<RefCell<Box<dyn Entity>>> = Vec::new();
     let mut background_color: Color = BLACK;
 
-    entities.push(Box::new(Player::new(IVec2 { x: 5, y: 5 })));
+    entities.push(RefCell::new(Box::new(Player::new(IVec2 { x: 5, y: 5 }))));
+    entities.push(RefCell::new(Box::new(Mover::new(
+        IVec2 { x: 7, y: 5 },
+        IVec2 { x: -1, y: 0 },
+    ))));
 
     loop {
         let delta = get_frame_time();
@@ -28,8 +33,8 @@ async fn main() {
         match action {
             InputAction::None => {}
             _ => {
-                for ent in entities.iter_mut() {
-                    let result: Result<(), String> = ent.update(&action);
+                for ent in entities.iter() {
+                    let result: Result<(), String> = ent.borrow_mut().update(&action, &entities);
                     if let Err(e) = result {
                         eprintln!("Error while updating entity: {e}")
                     };
@@ -40,7 +45,7 @@ async fn main() {
         {
             clear_background(background_color);
             for ent in entities.iter() {
-                let result: Result<(), String> = ent.render(delta);
+                let result: Result<(), String> = ent.borrow().render(delta);
                 if let Err(e) = result {
                     eprintln!("Error while rendering entity: {e}")
                 }
